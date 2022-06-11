@@ -1,0 +1,24 @@
+on join:
+    if {adminAwayReason} is set:
+        send "%nl%&4&lADMIN IS AWAY! %nL%&7%{adminAwayReason}%%nl%" to player
+
+command /away [<text>]:
+    permission: op
+    trigger:
+        if {adminAwayReason} is not set:
+            set {adminAwayReason} to arg-1
+            # set tablist name of player to "%player% &4&lAWAY"
+            # set player's default nametag to "%player% &4&lAWAY"
+            broadcast "%nl%&4&lADMIN IS AWAY! %nl%&7%{adminAwayReason}%%nl%"
+        else:
+            clear {alreadySentNotice}
+            clear {adminAwayReason}
+            # set tablist name of player to "%player%"
+            # reset player's default nametag
+            broadcast "%nl%<##7eff33>&lADMIN IS BACK!%nl%"
+
+on player move:
+    if player is op:
+        if {adminAwayReason} is set:
+            send "&7Movement detected! Would you like to <cmd:/away>&6&nannounce your return<reset>&7?" to player if {alreadySentNotice} is not true
+            set {alreadySentNotice} to true

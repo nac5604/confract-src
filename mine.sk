@@ -1,0 +1,146 @@
+options:
+    fortune_price: 500
+    blast_price: 75000
+    color_price: 100
+    rockets_price: 500
+
+on break:
+    if event-block is not stone:
+        if player's gamemode is not creative:
+            cancel event
+
+    if event-block is stone:
+        if player's gamemode is survival:
+            cancel event
+
+            breakBlock(player, event-block, false)
+
+            chance of 1%:
+                if player doesn't have potion effect speed:
+                    apply potion of speed 2 without particles to player for 30 seconds
+                    send title "&6&lENERGY BOOST" with subtitle "&730 seconds" to player
+
+            chance of 0.2%:
+                set {_r} to round(random number between 50000 and 100000)
+                add {_r} to {oddcoins::%player's uuid%}
+                send title "&6&lSURPRISE" with subtitle "&7+%formatCommas({_r})%¢"
+    
+    if event-block is deepslate:
+        if player's gamemode is survival:
+            cancel event
+
+            breakBlock(player, event-block, true)
+
+            chance of 0.2%:
+                set {_r} to round(random number between 100000 and 400000)
+                add {_r} to {oddcoins::%player's uuid%}
+                send title "&6&lSURPRISE" with subtitle "&7+%formatCommas({_r})%¢"
+
+function breakBlock(p: player, b: block, isDeepslate: boolean):
+    set {_blocksBroken} to 1
+
+    # Debugging
+    set {_bb} to random element of {trail::%{_p}'s uuid%.blocks::*}
+
+    if ({blast::%{_p}'s uuid%} ? 0) > 0:
+        chance of (({blast::%{_p}'s uuid%} ? 0) * 5)%:
+            loop all blocks in radius 3 of {_b}:
+                if loop-block is stone or deepslate:
+                    add 1 to {_blocksBroken}
+                make 1 of block particle using ({_bb} ? blackstone) at location above loop-block
+                chance of 50%:
+                    play sound "block.anvil.step" with volume 0.75 and pitch 1 to {_p}
+    
+    set {_oc} to ({_blocksBroken} * (1 + {fortune::%{_p}'s uuid%}))
+
+    set {_oc} to ({_oc} * 2) if {_isDeepslate} is true
+
+    add {_oc} to {oddcoins::%{_p}'s uuid%}
+    add {_blocksBroken} to {blocksBroken::%{_p}'s uuid%}
+    send action bar "&7+%formatCommas({_oc})% &8| &7%formatCommas({oddcoins::%{_p}'s uuid%})%" to {_p}
+
+    set block at location of {_b} to ({_bb} ? blackstone)
+    wait 1 second
+    set block at location of {_b} to deepslate if {_isDeepslate} is true else stone
+
+on right click:
+    if player's tool is a netherite pickaxe:
+        set metadata tag "enchants" of player to chest inventory with 3 rows named "&0Enchantments"
+        set {_g} to metadata tag "enchants" of player
+
+        set slot (integers from 0 to 8) of {_g} to black stained glass pane named "&7"
+        set slot (integers from 18 to 26) of {_g} to black stained glass pane named "&7"
+
+        set slot 12 of {_g} to tnt named "&c&lBLAST &8| &6%{blast::%player's uuid%} ? 0%" with lore "%nl%&7Mines all blocks in a &63 block%nl%&7radius of the mined block.%nl%%nl%" and "%nl%&fPrice: &e%formatCommas({@blast_price} * ({blast::%player's uuid%} + 1))%"
+        set slot 14 of {_g} to diamond named "&b&lFORTUNE &8| &6%{fortune::%player's uuid%} ? 0%" with lore "%nl%&7Gives extra coins&7 per block.%nl%%nl%" and "%nl%&fPrice: &e%formatCommas({@fortune_price} * ({fortune::%player's uuid%} + 1))%"
+        set slot 13 of {_g} to firework rocket named "&7&lROCKET FUEL" with lore "%nl%&7Propels your elytra.%nl%%nl%" and "%nl%&fPrice: &e{@rockets_price}"
+        set slot 17 of {_g} to blackstone named "&9&lTRAILS" with lore "%nl%&7Click this to access %nl%&7the trails menu."
+
+        open {_g} to player
+
+on inventory click:
+    if clicked slot is chestplate of player:
+        cancel event
+    if event-inventory = metadata tag "enchants" of player:
+        cancel event
+        if index of clicked slot is 12: 
+            set {_neededOC} to {@blast_price} * ({blast::%player's uuid%} + 1)
+            if {blast::%player's uuid%} is less than 10:
+                if {oddcoins::%player's uuid%} >= {_neededOC}:
+                    remove {_neededOC} from {oddcoins::%player's uuid%}
+                    add 1 to {blast::%player's uuid%}
+                    play sound "block.note_block.bit" with volume 0.25 to player
+                    set clicked slot to tnt named "&c&lBLAST &8| &6%{blast::%player's uuid%} ? 0%" with lore "%nl%&7Mines all blocks in a &63 block%nl%&7radius of the mined block.%nl%%nl%" and "%nl%&fPrice: &e%formatCommas({@blast_price} * ({blast::%player's uuid%} + 1))%"
+                else:
+                    set clicked slot to barrier named "&cYou don't have enough coins." with lore "&4%({@blast_price} * ({blast::%player's uuid%} + 1)) - {oddcoins::%player's uuid%}%"
+                    wait 2 seconds
+                    set clicked slot to tnt named "&c&lBLAST &8| &6%{blast::%player's uuid%} ? 0%" with lore "%nl%&7Mines all blocks in a &63 block%nl%&7radius of the mined block.%nl%%nl%" and "%nl%&fPrice: &e%formatCommas({@blast_price} * ({blast::%player's uuid%} + 1))%"
+
+        else if index of clicked slot is 14:
+            if click type is left mouse button:
+                set {_neededOC} to {@fortune_price} * ({fortune::%player's uuid%} + 1)
+                if {oddcoins::%player's uuid%} >= {_neededOC}:
+                    remove {_neededOC} from {oddcoins::%player's uuid%}
+                    add 1 to {fortune::%player's uuid%}
+                    play sound "block.note_block.bit" with volume 0.25 to player
+                    set clicked slot to diamond named "&b&lFORTUNE &8| &6%{fortune::%player's uuid%} ? 0%" with lore "%nl%&7Gives extra coins&7 per block.%nl%%nl%" and "%nl%&fPrice: &e%formatCommas({@fortune_price} * ({fortune::%player's uuid%} + 1))%"
+                else:
+                    set clicked slot to barrier named "&cYou don't have enough coins." with lore "&4%({@fortune_price} * ({fortune::%player's uuid%} + 1)) - {oddcoins::%player's uuid%}%"
+                    wait 2 seconds
+                    set clicked slot to diamond named "&b&lFORTUNE &8| &6%{fortune::%player's uuid%} ? 0%" with lore "%nl%&7Gives extra coins&7 per block.%nl%%nl%" and "%nl%&fPrice: &e%formatCommas({@fortune_price} * ({fortune::%player's uuid%} + 1))%"
+        
+        else if index of clicked slot is 13:
+            if click type is left mouse button:
+                if {oddcoins::%player's uuid%} >= {@rockets_price}:
+                    remove {@rockets_price} from {oddcoins::%player's uuid%}
+                    give firework rocket named "&7Rocket Fuel" to player
+                    play sound "block.note_block.bit" with volume 0.25 to player
+                else:
+                    set clicked slot to barrier named "&cYou don't have enough coins." with lore "&4%({@fortune_price} * ({fortune::%player's uuid%} + 1)) - {oddcoins::%player's uuid%}%"
+                    wait 2 seconds
+                    set slot 13 of {_g} to firework rocket named "&7&lROCKET FUEL" with lore "%nl%&7Propels your elytra.%nl%%nl%" and "%nl%&fPrice: &e{@rockets_price}"
+
+        else if index of clicked slot is 17:
+            MainMenu(player)
+                
+
+on hunger bar change:
+    cancel event
+on first join:
+   give player unbreakable netherite pickaxe of efficiency 255 named "&6&lPICKAXE" with lore "%nl%&7Right-click to access%nl%&7enchantments." with all flags hidden
+
+on join:
+    set chestplate of player to unbreakable elytra
+    toggle player's scoreboard on
+    while player is online:
+        set title of player's scoreboard to "&6&lCONFRACT"
+        set line 15 of player's scoreboard to ""
+        set line 14 of player's scoreboard to "&e&lPLAYER &f>"
+        set line 13 of player's scoreboard to "<##fdef9e>¢  &f%formatPlaces({oddcoins::%player's uuid%})%"
+        set line 12 of player's scoreboard to "<##fdef9e>⛏ &f%formatPlaces({blocksBroken::%player's uuid%} ? 0)%"
+        set line 11 of player's scoreboard to ""
+        set line 10 of player's scoreboard to "&e&lSERVER &f>"
+        set line 9 of player's scoreboard to "<##fdef9e>Online &f %amount of players%/10"
+        set line 8 of player's scoreboard to ""
+        set line 7 of player's scoreboard to "&6confract.minehut.gg"
+        wait 1 second

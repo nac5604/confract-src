@@ -1,0 +1,7 @@
+every 5 minutes:
+    loop all players:
+        set {_n} to random number between 1 and 0
+        if {_n} is 0:
+            send "%nl%&9&lPAYPAL PAYOUTS%nl%%nl%&7Whoever has the highest blocks mined OR%nl%the highest balance by the end of the season%nl%gets &e$25&7!%nl%" to loop-player
+        else:
+            send "%nl%&9&lCONFRACT DISCORD!%nl%&7Click <url:https://discord.gg/5kkpK5ZqFU>&7&nhere<reset>&7 to join the Confract community.%nl%" to loop-player

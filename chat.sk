@@ -1,0 +1,2 @@
+on chat:
+    set message format to "&6[%formatPlaces({blocksBroken::%player's uuid%} ? 0)%⛏] &f%player% > %message%"

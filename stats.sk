@@ -1,0 +1,19 @@
+command /stats [<offline player=%player%>]:
+    trigger:
+        set metadata tag "stat-gui" of player to chest inventory with 3 rows named "&0Stats for %arg-1%:"
+        set {_g} to metadata tag "stat-gui" of player
+
+        set slot (integers between 0 and 8) of {_g} to black stained glass pane named "&7"
+        set slot (integers between 18 and 26) of {_g} to black stained glass pane named "&7"
+
+        set slot 10 of {_g} to honeycomb named "&e&lCOINS &8| &6%formatCommas({oddcoins::%arg-1's uuid%} ? 0)%"
+        set slot 11 of {_g} to iron pickaxe named "&e&lMINED &8| &6%formatCommas({blocksBroken::%arg-1's uuid%} ? 0)%" with all flags hidden
+        set slot 13 of {_g} to skull of arg-1 named "&6&l%arg-1%" with lore "%nl%&7%arg-1's uuid%"
+        set slot 15 of {_g} to tnt named "&e&lBLAST &8| &6%formatCommas({blast::%arg-1's uuid%} ? 0)%" with lore "%nl%&f(&7≈%formatCommas(1 * (1 + {fortune::%arg-1's uuid%}))%¢ &f| &8≈%formatCommas((1 * (1 + {fortune::%arg-1's uuid%})) * 2)%¢ &fper block)" and "%nl%&f(&7≈%formatCommas(29 * (1 + {fortune::%arg-1's uuid%}))%¢ &f| &8≈%formatCommas((29 * (1 + {fortune::%arg-1's uuid%})) * 2)%¢ &fper blast)"
+        set slot 16 of {_g} to diamond named "&e&lFORTUNE &8| &6%formatCommas({fortune::%arg-1's uuid%} ? 0)%" with lore "%nl%&f(&7≈%formatCommas(1 * (1 + {fortune::%arg-1's uuid%}))%¢ &f| &8≈%formatCommas((1 * (1 + {fortune::%arg-1's uuid%})) * 2)%¢ &fper block)" and "%nl%&f(&7≈%formatCommas(29 * (1 + {fortune::%arg-1's uuid%}))%¢ &f| &8≈%formatCommas((29 * (1 + {fortune::%arg-1's uuid%})) * 2)%¢ &fper blast)"
+
+        open {_g} to player
+
+on inventory click:
+    if event-inventory = metadata tag "stat-gui" of player:
+        cancel event

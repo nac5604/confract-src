@@ -1,0 +1,33 @@
+# Utility Skripts
+
+# Function to format numbers according to the amount of places they have.
+# Example:
+# - 5,000 > 5k
+# - 10,000,000,000 > 10b
+# By https://forums.minehut.com/profile/424587-skpnguin/.
+function formatPlaces(n: number) :: text:
+    set {_data} to "QT,18|Q,15|T,12|B,9|M,6|k,3"
+    loop split {_data} at "|":
+        set {_s::*} to split loop-value at ","
+        {_n} >= 10 ^ {_s::2} parsed as number
+        return "%{_n} / 10 ^ {_s::2} parsed as number%%{_s::1}%"
+    return "%{_n}%"
+
+# Function to place commas in large numbers.
+# Exmaple:
+# - 5000 > 5,000
+# - 10000000000 > 10,000,000,000
+# By https://www.spigotmc.org/members/shanebee.226272/.
+function formatCommas(n: object) :: text:
+    if "%{_n}%" contains ".":
+        set {_s::*} to split "%{_n}%" at "."
+        set {_n} to "%a({_s::1})%.%last 2 characters of {_s::2}%"
+        return "%{_n}%"
+    else:
+        set {_n} to a("%{_n}%")
+        return "%{_n} ? 0%"
+function a(b: text) :: text:
+    if length of {_b} > 3:
+        return "%a(first length of {_b} - 3 characters of {_b})%,%last 3 characters of {_b}%"
+    return {_b}
+

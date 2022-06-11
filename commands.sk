@@ -1,0 +1,15 @@
+# Commands
+
+command /setBlast <num> [<player=%player%>]:
+    permission: op
+    trigger:
+        set {blast::%arg-2's uuid%} to arg-1
+
+command /pickaxe [<player=%player%>]:
+    trigger:
+        give player unbreakable netherite pickaxe of efficiency 255 named "&6&lPICKAXE" with lore "%nl%&7Right-click to access%nl%&7enchantments." with all flags hidden
+
+command /discord:
+    aliases: chat, dc, community
+    trigger:
+        send "%nl%&9&lCONFRACT DISCORD!%nl%&7Click <url:https://discord.gg/5kkpK5ZqFU>&7&nhere<reset>&7 to join the Confract community.%nl%" to player

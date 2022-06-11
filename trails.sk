@@ -1,0 +1,83 @@
+command /trail:
+    aliases: trails, trl
+    trigger:
+        MainMenu(player)
+
+function MainMenu(p: player):
+    set metadata tag "trails-menu" of {_p} to chest inventory with 6 rows named "&0Trails"
+    set {_g} to metadata tag "trails-menu" of {_p}
+
+    set slot (integers between 0 and 8) of {_g} to black stained glass pane named "&7"
+    set slot (integers between 45 and 53) of {_g} to black stained glass pane named "&7"
+
+    loop 9 times:
+        set slot (8 + loop-value) of {_g} to lime concrete of efficiency 1 named "&a&lTRAIL %loop-value%" with all flags hidden if {trail::%{_p}'s uuid%.excl} is loop-value else gray concrete named "&7TRAIL %loop-value%"
+
+    # Trail 1
+    set slot 18 of {_g} to cobblestone
+    set slot 27 of {_g} to andesite
+    set slot 36 of {_g} to tuff
+
+    # Trail 2
+    set slot 19 of {_g} to deepslate coal ore
+    set slot 28 of {_g} to deepslate iron ore
+    set slot 37 of {_g} to deepslate gold ore
+
+    # Trail 3
+    set slot 20 of {_g} to redstone ore
+    set slot 29 of {_g} to sandstone
+    set slot 38 of {_g} to redstone block
+
+    # Trail 4
+    set slot 21 of {_g} to netherrack
+    set slot 30 of {_g} to nether gold ore
+    set slot 39 of {_g} to nether quartz ore
+
+    # Trail 5
+    set slot 22 of {_g} to netherrack
+    set slot 31 of {_g} to magma block
+    set slot 40 of {_g} to smooth red sandstone
+
+    # Trail 6
+    set slot 23 of {_g} to block of raw gold
+    set slot 32 of {_g} to gold block
+    set slot 41 of {_g} to honeycomb block
+
+    # Trail 7
+    set slot 24 of {_g} to jack o lantern
+    set slot 33 of {_g} to shroomlight
+    set slot 42 of {_g} to glowstone
+
+    # Trail 8
+    set slot 25 of {_g} to end stone
+    set slot 34 of {_g} to purpur block
+    set slot 43 of {_g} to obsidian
+
+    # Trail 9
+    set slot 26 of {_g} to packed ice
+    set slot 35 of {_g} to blue ice
+    set slot 44 of {_g} to cyan concrete
+
+    set slot 4 of {_g} to barrier named "&c&lCLEAR TRAIL"
+
+    open {_g} to {_p}
+
+on inventory click:
+    if event-inventory = metadata tag "trails-menu" of player:
+        cancel event
+        if index of clicked slot is between 9 and 17:
+            set {trail::%player's uuid%.excl} to (index of clicked slot - 8)
+            loop 9 times:
+                set slot (8 + loop-value) of event-inventory to lime concrete of efficiency 1 named "&a&lTRAIL %loop-value%" with all flags hidden if {trail::%player's uuid%.excl} is loop-value else gray concrete named "&7TRAIL %loop-value%"
+
+            clear {trail::%player's uuid%.blocks::*}
+            add slot (index of clicked slot + 9) of event-inventory to {trail::%player's uuid%.blocks::*} 
+            add slot (index of clicked slot + 18) of event-inventory to {trail::%player's uuid%.blocks::*}
+            add slot (index of clicked slot + 27) of event-inventory to {trail::%player's uuid%.blocks::*}
+
+        else if index of clicked slot is 4:
+            clear {trail::%player's uuid%.excl}
+            loop 9 times:
+                set slot (8 + loop-value) of event-inventory to lime concrete of efficiency 1 named "&a&lTRAIL %loop-value%" with all flags hidden if {trail::%player's uuid%.excl} is equal to loop-value else gray concrete named "&7TRAIL %loop-value%"
+            clear {trail::%player's uuid%.blocks::*}
+            add blackstone to {trail::%player's uuid%.blocks::*}

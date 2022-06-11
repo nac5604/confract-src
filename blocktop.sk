@@ -1,0 +1,32 @@
+command /blocktop:
+    trigger:
+        loop {blocksBroken::*}:
+            add 1 to {_s}
+            if {_lowToHighList::%loop-value%} is not set:
+                set {_lowToHighList::%loop-value%} to loop-index
+            
+            else:
+                set {_n} to 0
+                loop {_s} times:
+                    set {_n} to {_n} + 1
+                    set {_lowToHighList::%loop-value-1%.%{_n}%} to loop-index if {_lowToHighList::%loop-value-1%.%{_n}%} is not set
+                    stop loop
+        wait 1 tick
+
+        set {_n} to size of {_lowToHighList::*}
+        loop {_lowToHighList::*}:
+            set {_highToLowList::%{_n}%} to loop-value
+            set {_n} to {_n} - 1
+        
+        set {_i} to 0
+
+        send "%nl%&6&lBLOCKTOP:%nl%"
+        loop {_highToLowList::*}:
+            set {_p} to "%loop-value%" parsed as offline player
+            if {_p} is op:
+                send formatted "&7%loop-index%) <tooltip:&f%formatCommas({blocksBroken::%loop-value%})%<##fdef9e>⛏ %nl%%nl%&cThis player is an operator;%nl%&ctheir score will not be counted.>&f%{_p}%<reset> &c&l[OP]"
+            else:
+                send formatted "&7%loop-index%) <tooltip:&f%formatCommas({blocksBroken::%loop-value%})%<##fdef9e>⛏>&f%{_p}%<reset>"
+            if loop-index parsed as number + 1 is 10:
+                stop
+        send ""

@@ -1,0 +1,10 @@
+command /pay <player> <num>:
+    trigger:
+        if {oddcoins::%player's uuid%} >= arg-2:
+            remove arg-2 from {oddcoins::%player's uuid%}
+            add arg-2 to {oddcoins::%arg-1's uuid%}
+
+            send "&aSent &e%formatCommas(arg-2)%¢&a to %arg-1%!" to player
+            send "&aRecieved &e%formatCommas(arg-2)%¢&a from %player%!" to arg-1
+        else:
+            send "&cYou don't have that much!" to player
